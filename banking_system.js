@@ -1,137 +1,126 @@
 // modular OOP
-// asyncronous setelah melakukan transaksi.
+// Async saat transaksi
 
-class CostumError extends Error {
+class CustomError extends Error {
     constructor(message) {
         super(message);
-        this.name = 'ValidationError';
+        this.name = 'Information Error is';
     }
 }
 
-class BankAccount {
-    constructor(name) {
-        this.name = name;
-        this.balance = '50000';
+class Customers{
+    constructor(nama,age,country){
+        this.nama = nama;
+        this.age = age;
+        this.country = country;
     }
 
-    getBalance() {
-        return `Saldo ${this.nama} Saat ini adalah ${this.balance}`;
+    getProfile(){
+        return `Nama ${this.nama}, Umur ${this.age} tahun, Kota ${this.country}`;
+    }
+    getName(){
+        return this.nama;
     }
 }
 
-
-class BankSystem extends BankAccount {
-    constructor(name) {
-        super(name, balance);
-    }
-    #countDeposit = (amount, balance) => {
-        balance = balance + amount;
-        return balance;
+class BankAccount extends Customers{
+    constructor(nama,age,country){
+        super(nama,age,country);
+        this.balance = 50000;
     }
 
-    #countWithdraw = (amount, balance) => {
-        console.log(balance);
-        balance = balance - amount;
-        return balance;
+    checkBalance(){
+        return `Saldo anda saat ini adalah ${this.balance}`;
     }
 
-    doDeposit(amount) {
-        setTimeout(() => {
-            this.balance = this.#countDeposit(amount, this.balance);
-        }, 3000);
-        console.log(this.balance);
-        return;
+    #countDeposit(amount){
+        this.balance = this.balance + amount;
+        return this.balance;
     }
-    doWithdraw(amount) {
+
+    #countWithDraw(amount){
+        this.balance = this.balance - amount;
+        return this.balance;
+    }
+
+    doDeposit(amount){
+        console.log('sedang melakukan proses transaksi deposit mohon ditunggu');
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                const withdraw = this.#countWithdraw(amount, this.balance);
-                if (withdraw < 0) {
-                    reject(new Error('Saldo Tidak Mencukupi'));
-                    return;
+                let theAmount = Number(amount);
+                if(isNaN(theAmount)){
+                    reject(new CustomError('input tidak valid'));
+                } 
+                if((theAmount < 0)) {
+                    reject(new CustomError('Angka dalam Inputan dibawah 0'));
+                }
+                const deposit = this.#countDeposit(theAmount);
+                resolve(deposit);
+            },3000);
+        }) 
+    }
+
+    doWithdraw(amount){
+        console.log('sedang melakukan proses transaksi withdraw mohon ditunggu');
+        return new Promise((resolve,reject) => {
+            setTimeout(() => {
+                let theAmount = Number(amount);
+                if(isNaN(theAmount)){
+                    reject(new CustomError('input tidak valid'));
+                } 
+                if((theAmount < 0)) {
+                    reject(new CustomError('Angka dalam Inputan dibawah 0'));
+                }
+                const withdraw = this.#countWithDraw(theAmount);
+                if(withdraw < 0){
+                    reject(new CustomError('Saldo Tidak Mencukupi'));
                 }
                 resolve(withdraw);
-            }, 3000);
+            },3000);
         });
     }
-
-    getBalance() {
-        setTimeout(() => {
-            console.log(`Jumlah Balance saat ini adalah ${this.balance}`);
-        }, 2000);
-        return;
-    }
 }
 
-function main() {
-    const Budi = new BankSystem("budi", 1000);
-    console.log(Budi.doDeposit(2000));
-    console.log(Budi.getBalance());
-    //console.log(Budi.getBalance());
-}
-main();
-
-function mainFunction() {
+function main(){
     let choice = 0;
-    let amount = 0;
-    let name = "";
+    const bankAcc1 = new BankAccount('Budi','24','Jakarta');
     const tambahWord = `Inputkan Saldo yang ingin anda tambahkan`
     const kurangWord = `Inputkan Pengurangan Saldo yang anda inginkan`
-
-    name = window.prompt(`Selamat Datang di Bank Akun KitaBersama silahkan Masukan Input Nasabah`);
-
-    const Costumers = new BankSystem(name);
-
-    while (choice != 3) {
+    while (choice != 4) {
         choice = window.prompt(`
+        Selamat Datang Bapak/Ibu ${bankAcc1.getName()} di Bank Account
         Silahkan pilih menu yang kamu inginkan
-        pilih 1, Deposit
-        pilih 2, Withdraw
-        pilih 3, GetBalance
+        pilih 1, Tambah Saldo 
+        pilih 2, Kurang Saldo
+        pilih 3, Cek Saldo
         pilih 4, Logout Account
     `);
         if (choice == 1) {
-            amount = parseInt(window.prompt(tambahWord));
-            // Deposit
-            try {
-                if (typeof (amount) != Number) {
-                    throw new CostumError('input bukan angka');
-                }
-                if (isNaN(amount)) {
-                    throw new CostumError('input tidak valid');
-                }
-                if (amount < 0) {
-                    reject(new Error('jumlah yang diinput dibawah 0'));
-                    return;
-                }
-                // do deposit
-                Costumers.doDeposit(amount);
-            } catch (error) {
-                alert(error.message);
-            }
+            let amount = window.prompt(tambahWord);
+            alert('sedang melakukan proses transaksi deposit mohon ditunggu');
+            bankAcc1.doDeposit(amount)
+            .then(resolve => {
+                alert('Transaksi Berhasil');
+            })
+            .catch(reject => {
+                alert('Transaksi Gagal');
+                alert(reject);
+            });
         }
         else if (choice == 2) {
-            amount = parseInt(window.prompt(kurangWord));
-            // Withdraw
-            try {
-                if (typeof (amount) != Number) {
-                    throw new CostumError('input bukan angka');
-                }
-                if (isNaN(amount)) {
-                    throw new CostumError('input tidak valid');
-                }
-                if (amount < 0) {
-                    throw new CostumError('jumlah yang di-input dibawah 0');
-                }
-                // do Withdraw
-                Costumers.doWithdraw(amount);
-            } catch (error) {
-                alert(error.message);
-            }
+            let amount = window.prompt(kurangWord);
+            alert('sedang melakukan proses transaksi withdraw mohon ditunggu');
+            bankAcc1.doWithdraw(amount)
+            .then(resolve => {
+                alert('Transaksi Berhasil');
+            })
+            .catch(reject => {
+                alert('Transaksi Gagal');
+                alert(reject);
+            });
         }
-        else if (choice == 3) {
-            // do getbalance
-            Costumers.getBalance();
+        else if (choice == 3){
+            alert(bankAcc1.checkBalance());
         }
         else if (choice == 4) {
             alert("Account berhasil diLogout");
@@ -141,4 +130,5 @@ function mainFunction() {
         }
     }
 }
-mainFunction();
+
+main();
